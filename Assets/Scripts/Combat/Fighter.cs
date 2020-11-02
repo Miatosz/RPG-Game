@@ -10,7 +10,8 @@ namespace RPG.Combat
     {
 
         [SerializeField] float timeBeetwenAtacks = 1f;
-        [SerializeField] private Transform handTransform = null;
+        [SerializeField] private Transform rightHandTransform = null;
+        [SerializeField] private Transform leftHandTransform = null;
         [SerializeField] private Weapon defaultWeapon = null;
         
         private Health target;
@@ -55,7 +56,7 @@ namespace RPG.Combat
         {
             currentWeapon = weapon;
             Animator animator = GetComponent<Animator>();
-            weapon.Spawn(handTransform, animator);
+            weapon.Spawn(rightHandTransform, leftHandTransform, animator);
         }
 
         private void AttackBehaviour()
@@ -66,6 +67,7 @@ namespace RPG.Combat
                 TriggerAttack();
                 timeSinceLastAttack = 0;
             }
+            
         }
 
         private void TriggerAttack()
@@ -78,7 +80,20 @@ namespace RPG.Combat
         void Hit()
         {
             if (target == null) return;
-            target.TakeDamage(currentWeapon.GetWeaponDamage());
+
+            if (currentWeapon.HasProjectile())
+            {
+                currentWeapon.LaunchProjectile(rightHandTransform, leftHandTransform, target);
+            }
+            else
+            {
+                target.TakeDamage(currentWeapon.GetWeaponDamage());
+            }
+        }
+
+        void Shoot()
+        {
+            Hit();
         }
 
         bool isPlayer()
